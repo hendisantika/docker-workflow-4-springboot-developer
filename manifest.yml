@@ -1,0 +1,6 @@
+---
+applications:
+  - name: belajar-ci
+    path: target/docker-workflow-4-springboot-developer0.0.1-SNAPSHOT.jar
+    services:
+  - belajar-ci-db
