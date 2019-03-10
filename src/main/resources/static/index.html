@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Input Session Variables</title>
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet">
+    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://unpkg.com/vue-material/dist/vue-material.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+        window.addEventListener('load', function () {
+            var urlHostInfo = "/api/host";
+            var urlSessionInfo = "/api/session";
+            var urlFileInfo = "/api/file";
+            Vue.use(VueMaterial);
+            new Vue({
+                el: '#app',
+                data: {
+                    hostData: {},
+                    sessionData: {},
+                    fileData: {},
+                    submitData: {},
+                    uploadfile: null,
+                    uploadOutput: null
+                },
+                created: function () {
+                    this.reloadData();
+                },
+                methods: {
+                    getHostInfo: function () {
+                        console.log("Mengambil info host");
+                        axios.get(urlHostInfo)
+                            .then(response = > {
+                            console.log("Response : ", response);
+                        this.hostData = response.data;
+                    })
+                    .
+                        catch(e = > console.error(e);
+                    )
+                    },
+                    getSessionInfo: function () {
+                        console.log("Mengambil info session");
+                        axios.get(urlSessionInfo)
+                            .then(response = > {
+                            console.log("Response : ", response);
+                        this.sessionData = response.data;
+                    })
+                    .
+                        catch(e = > console.error(e);
+                    )
+                    },
+                    getFileInfo: function () {
+                        console.log("Mengambil info file");
+                        axios.get(urlFileInfo)
+                            .then(response = > {
+                            console.log("Response : ", response);
+                        this.fileData = response.data;
+                    })
+                    .
+                        catch(e = > console.error(e);
+                    )
+                    },
+                    reloadData: function () {
+                        this.getHostInfo();
+                        this.getSessionInfo();
+                        this.getFileInfo();
+                    },
+                    openDialog: function (ref) {
+                        this.$refs[ref].open();
+                    },
+                    simpanDataSession: function () {
+                        var data = {};
+                        data[this.submitData.name] = this.submitData.value;
+                        this.submitData = {};
+                        console.log(data);
+                        axios.post(urlSessionInfo, data)
+                            .then(response = > {
+                            console.log(response.status);
+                        this.getSessionInfo();
+                    })
+                    .
+                        catch(err = > console.error(err);
+                    )
+                        this.$refs['inputSession'].close();
+                    },
+                    batalSimpan: function () {
+                        this.$refs['inputSession'].close();
+                    },
+                    deleteDataSession: function (varname) {
+                        axios.delete(urlSessionInfo + "/" + varname)
+                            .then(response = > {
+                            console.log(response.status);
+                        this.getSessionInfo();
+                    })
+                    .
+                        catch(err = > console.error(err);
+                    )
+                    },
+                    upload: function () {
+                        var config = {
+                            onUploadProgress: function (progressEvent) {
+                                var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                                this.uploadOutput = percentCompleted + "%";
+                            }
+                        };
+                        var data = new FormData();
+                        data.append('uploadfile', document.getElementById('uploadfile').files[0]);
+                        axios.post(urlFileInfo, data, config)
+                            .then(res = > {
+                            this.getFileInfo();
+                        this.uploadOutput = res.data;
+                        document.getElementById('uploadfile').value = null;
+                    })
+                    .
+                        catch(function (err) {
+                            this.uploadOutput = err.message;
+                        });
+                    },
+                    deleteFile: function (file) {
+                        axios.delete(urlFileInfo + "/" + file.nama)
+                            .then(() = > {
+                            this.getFileInfo();
+                    })
+                    }
+                }
+            })
+        });
+    </script>
+
+    <style>
+        .main-content {
+            padding: 16px;
+        }
+
+        .md-table .md-table-cell .md-button .md-icon {
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <md-card>
+        <md-card-header>
+            <div class="md-title"><h2>Clustering Demo</h2></div>
+            <div class="md-subhead">melihat kondisi aplikasi pada saat dicluster</div>
+            <p>Klik reload untuk melakukan request ulang, siapa tahu dilayani oleh host berbeda</p>
+            <md-button @click.native="reloadData" class="md-fab md-primary">
+                <md-icon>loop</md-icon>
+            </md-button>
+        </md-card-header>
+        <md-card-content>
+
+            <md-tabs md-centered>
+                <md-tab @click="getHostInfo" id="movies" md-label="Host Info">
+                    <h3>Informasi tentang host dimana aplikasi berjalan</h3>
+
+                    <p v-if="Object.keys(hostData).length < 1">Data host tidak ada</p>
+
+                    <md-table v-if="Object.keys(hostData).length > 0">
+                        <md-table-header>
+                            <md-table-row>
+                                <md-table-head>Informasi</md-table-head>
+                                <md-table-head>Keterangan</md-table-head>
+                            </md-table-row>
+                        </md-table-header>
+
+                        <md-table-body>
+                            <md-table-row v-for="(value, key) in hostData">
+                                <md-table-cell>{{key}}</md-table-cell>
+                                <md-table-cell>{{value}}</md-table-cell>
+                            </md-table-row>
+                        </md-table-body>
+                    </md-table>
+                </md-tab>
+
+                <md-tab id="music" md-label="Session Variables">
+                    <h3>Variabel dalam harus tetap ada walaupun diarahkan ke host manapun.</h3>
+
+                    <md-button class="md-fab md-primary" id="fab" v-on:click.native="openDialog('inputSession')">
+                        <md-icon>add</md-icon>
+                    </md-button>
+
+                    <p v-if="Object.keys(sessionData).length < 1">Data session tidak ada</p>
+
+                    <md-table v-if="Object.keys(sessionData).length > 0">
+                        <md-table-header>
+                            <md-table-row>
+                                <md-table-head>Informasi</md-table-head>
+                                <md-table-head>Keterangan</md-table-head>
+                                <md-table-head>&nbsp;</md-table-head>
+                            </md-table-row>
+                        </md-table-header>
+
+                        <md-table-body>
+                            <md-table-row v-for="(value, key) in sessionData">
+                                <md-table-cell>{{key}}</md-table-cell>
+                                <md-table-cell>{{value}}</md-table-cell>
+                                <md-table-cell>
+                                    <md-button @click.native="deleteDataSession(key)" class="md-mini">
+                                        <md-icon>delete</md-icon>
+                                    </md-button>
+                                </md-table-cell>
+                            </md-table-row>
+                        </md-table-body>
+                    </md-table>
+                </md-tab>
+
+                <md-tab id="books" md-label="File">
+                    <h3>File yang diupload harus tetap ada walaupun diarahkan ke host manapun.</h3>
+                    <form class="form" onsubmit="return false;" role="form">
+                        <input id="uploadfile" type="file"/>
+                        <md-button @click.native="upload" class="md-primary">Upload</md-button>
+                    </form>
+                    <div>{{uploadOutput}}</div>
+                    <md-table>
+                        <md-table-header>
+                            <md-table-row>
+                                <md-table-head>Nama File</md-table-head>
+                                <md-table-head>Ukuran</md-table-head>
+                                <md-table-head>&nbsp;</md-table-head>
+                            </md-table-row>
+                        </md-table-header>
+
+                        <md-table-body>
+                            <md-table-row v-for="f in fileData">
+                                <md-table-cell>{{f.nama}}</md-table-cell>
+                                <md-table-cell>{{f.ukuran}}</md-table-cell>
+                                <md-table-cell>
+                                    <md-button class="md-mini" v-bind:href="'/api/file/'+f.nama">
+                                        <md-icon>get_app</md-icon>
+                                    </md-button>
+                                    <md-button @click.native="deleteFile(f)" class="md-mini">
+                                        <md-icon>delete</md-icon>
+                                    </md-button>
+                                </md-table-cell>
+                            </md-table-row>
+                        </md-table-body>
+                    </md-table>
+                </md-tab>
+            </md-tabs>
+        </md-card-content>
+    </md-card>
+    <md-dialog md-close-to="#fab" md-open-from="#fab" ref="inputSession">
+        <md-dialog-title>Input Session Variabel</md-dialog-title>
+
+        <md-dialog-content>
+            <form>
+                <md-input-container md-inline>
+                    <label>Nama Variabel</label>
+                    <md-input v-model="submitData.name"></md-input>
+                </md-input-container>
+                <md-input-container md-inline>
+                    <label>Isi Variabel</label>
+                    <md-input v-model="submitData.value"></md-input>
+                </md-input-container>
+            </form>
+        </md-dialog-content>
+
+        <md-dialog-actions>
+            <md-button @click.native="batalSimpan" class="md-primary">Cancel</md-button>
+            <md-button @click.native="simpanDataSession" class="md-primary">Simpan</md-button>
+        </md-dialog-actions>
+    </md-dialog>
+</div>
+
+</body>
+</html>
