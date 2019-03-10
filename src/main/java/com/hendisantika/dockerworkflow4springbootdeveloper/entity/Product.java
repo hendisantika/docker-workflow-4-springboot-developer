@@ -1,5 +1,6 @@
 package com.hendisantika.dockerworkflow4springbootdeveloper.entity;
 
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product")
+@Data
 public class Product {
     @Id
     @GeneratedValue(generator = "uuid")
