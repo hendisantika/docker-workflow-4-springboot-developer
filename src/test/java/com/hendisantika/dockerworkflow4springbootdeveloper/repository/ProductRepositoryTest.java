@@ -11,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,12 +44,12 @@ public class ProductRepositoryTest {
 
     @Test
     public void testFindById() {
-        Optional<Product> p = productRepository.findById("abc123");
+        Product p = productRepository.findOne("abc123");
         Assert.assertNotNull(p);
-        Assert.assertEquals("P-001", p.get().getCode());
-        Assert.assertEquals("Product 001", p.get().getName());
-        Assert.assertEquals(BigDecimal.valueOf(101000.01), p.get().getPrice());
+        Assert.assertEquals("P-001", p.getCode());
+        Assert.assertEquals("Product 001", p.getName());
+        Assert.assertEquals(BigDecimal.valueOf(101000.01), p.getPrice());
 
-        Assert.assertNull(productRepository.findById("notexist"));
+        Assert.assertNull(productRepository.findOne("notexist"));
     }
 }
