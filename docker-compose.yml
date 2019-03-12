@@ -9,10 +9,11 @@ services:
       - MYSQL_USER=belajar
       - MYSQL_PASSWORD=java
     volumes:
-      - /opt/data:/var/lib/mysql
+      #      - /opt/data:/var/lib/mysql
+      - /tmp/data/mysql:/var/lib/mysql
 
   belajarci-app:
-    image: hendisantika/belajar-ci
+    image: hendisantika/docker-workflow-4-springboot-developer
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
