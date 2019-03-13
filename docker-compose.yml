@@ -1,7 +1,7 @@
-version: "2.1"
+version: "3"
 
 services:
-  mysql:
+  mysql-docker-container:
     image: mysql:latest
     environment:
       - MYSQL_ROOT_PASSWORD=admin
@@ -10,13 +10,16 @@ services:
       - MYSQL_PASSWORD=java
     volumes:
       #      - /opt/data:/var/lib/mysql
-      - /tmp/data/mysql:/var/lib/mysql
-
-  belajarci-app:
+      #      - /tmp/data/mysql:/var/lib/mysql
+      - /data/mysql
+  springboot-container:
     image: hendisantika/docker-workflow-4-springboot-developer
     environment:
+      #      - SPRING_PROFILES_ACTIVE=default
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      - mysql
+      - mysql-docker-container
     ports:
-    - 80:8080
+      - 8087:8080
+    volumes:
+      - /data/springboot-container
