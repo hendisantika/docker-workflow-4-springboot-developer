@@ -62,7 +62,7 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = false)
     public void update(@PathVariable("id") String id, @RequestBody @Valid Product p) {
-        if (!productRepository.exists(id)) {
+        if (!productRepository.existsById(id)) {
             throw new DataNotFoundException("No data with the specified id");
         }
         p.setId(id);
@@ -73,9 +73,9 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     @Transactional(readOnly = false)
     public void delete(@PathVariable("id") String id) {
-        if (!productRepository.exists(id)) {
+        if (!productRepository.existsById(id)) {
             throw new DataNotFoundException("No data with the specified id");
         }
-        productRepository.delete(id);
+        productRepository.deleteById(id);
     }
 }
